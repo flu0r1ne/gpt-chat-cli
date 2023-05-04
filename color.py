@@ -1,6 +1,5 @@
 from typing import Literal
 
-
 class ColorCode:
     """A superclass to signal that color codes are strings"""
 

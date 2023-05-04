@@ -1,8 +1,9 @@
 import json
+import openai
+
 from typing import Any, List, Optional, Generator
 from dataclasses import dataclass
 from enum import Enum, auto
-import openai
 
 @dataclass
 class Delta:

@@ -1,8 +1,9 @@
 import argparse
-from collections import defaultdict
 import sys
 import openai
 import pickle
+
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple
 
