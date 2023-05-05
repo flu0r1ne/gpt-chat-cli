@@ -1,6 +1,8 @@
 gpt-chat-cli
 ------------
 
+> This is a WIP. Please consider it experimental.
+
 A simple ChatGPT CLI.
 
 ### Installation:
@@ -112,4 +114,3 @@ options:
 - [x] Support for any model which is supported through the chat completions API. [See model endpoint compatibility.](https://platform.openai.com/docs/models/model-endpoint-compatibility)
 - [x] Capability to modify parameters including temperature, frequency penalty, presence penalty, top p, and the maximum number of tokens emitted.
 
-> This is a WIP.
