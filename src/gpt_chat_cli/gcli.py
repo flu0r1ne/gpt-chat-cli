@@ -125,7 +125,6 @@ def print_streamed_response(
             prompt_printed = True
             print(PROMPT, end=' ', flush=True)
 
-
         content = display_response.take_delta()
         print(f'{COLOR_CODE.WHITE}{content}{COLOR_CODE.RESET}',
               sep='', end='', flush=True)

@@ -287,7 +287,9 @@ def parse_args() -> Arguments:
             args.adornments = AutoDetectedOption.OFF
 
     if args.message is None:
-        if sys.stdin.isatty():
+        if debug and args.load_response_from_file:
+            args.interactive = False
+        elif sys.stdin.isatty():
             args.interactive = True
 
     if not debug:
