@@ -132,22 +132,21 @@ def print_streamed_response(
             else:
                 print(end='\n', flush=True)
 
-def main():
-    args = parse_args()
+def cmd_version():
+    print(f'version {VERSION}')
 
-    if args.version:
-        print(f'version {VERSION}')
-        sys.exit(0)
+def cmd_list_models():
+    for model in list_models():
+        print(model)
 
-    if args.list_models:
-
-        for model in list_models():
-            print(model)
-
-        sys.exit(0)
-
-    completion_args = args.completion_args
+def cmd_interactive(args : Arguments):
     COLOR_CODE = get_color_codes(no_color = not args.display_args.color)
+
+    print(f'GPT Chat CLI {VERSION}')
+    print(f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}]', end=' ', flush=True)
+
+def cmd_singleton(args: Arguments):
+    completion_args = args.completion_args
 
     debug_args : DebugArguments = args.debug_args
 
@@ -157,11 +156,7 @@ def main():
     elif debug_args.load_response_from_file:
         completion_args, completion = load_response_and_arguments(args)
     else:
-        if args.completion_args.message is None:
-            if sys.stdin.isatty():
-                print(f'GPT Chat CLI {VERSION}')
-                print(f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}]', end=' ', flush=True)
-
+        if completion_args.message is None:
             completion_args.message = sys.stdin.read()
 
         completion = create_chat_completion_from_args(completion_args)
@@ -171,6 +166,19 @@ def main():
         completion,
         completion_args.n_completions
     )
+
+
+def main():
+    args = parse_args()
+
+    if args.version:
+        cmd_version()
+    elif args.list_models:
+        cmd_list_models()
+    elif args.interactive:
+        cmd_interactive(args)
+    else:
+        cmd_singleton(args)
 
 if __name__ == "__main__":
     main()

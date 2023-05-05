@@ -19,7 +19,7 @@ def die_validation_err(err : str):
     print(err, file=sys.stderr)
     sys.exit(1)
 
-def validate_args(args: argparse.Namespace) -> None:
+def validate_args(args: argparse.Namespace, debug : bool = False) -> None:
     if not 0 <= args.temperature <= 2:
         die_validation_err("Temperature must be between 0 and 2.")
 
@@ -37,6 +37,16 @@ def validate_args(args: argparse.Namespace) -> None:
 
     if args.n_completions < 1:
         die_validation_err("Number of completions must be greater than or equal to 1.")
+
+    if args.interactive and args.n_completions != 1:
+        die_validation_err("Only a single completion can be used in interactive mode")
+
+    if debug and args.interactive:
+
+        if args.interactive and (
+            args.save_response_to_file or args.load_response_from_file
+        ):
+            die_validation_err("Save and load operations cannot be used in interactive mode")
 
 @dataclass
 class CompletionArguments:
@@ -66,6 +76,7 @@ class Arguments:
     display_args: DisplayArguments
     version: bool
     list_models: bool
+    interactive: bool
     debug_args: Optional[DebugArguments] = None
 
 def split_arguments(args: argparse.Namespace) -> Arguments:
@@ -96,6 +107,7 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
            debug_args=debug_args,
            version=args.version,
            list_models=args.list_models,
+           interactive=args.interactive
     )
 
 def parse_args() -> Arguments:
@@ -217,12 +229,19 @@ def parse_args() -> Arguments:
     )
 
     parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help="Start an interactive session"
+    )
+
+    parser.add_argument(
         "message",
         type=str,
         nargs='?',
         help=(
-            "The contents of the message. When used in chat mode, this is the initial "
-            "message if provided."
+            "The contents of the message. When in a interactive session, this is "
+            " the initial prompt provided."
         ),
     )
 
@@ -268,10 +287,14 @@ def parse_args() -> Arguments:
         else:
             args.adornments = AutoDetectedOption.OFF
 
+    if args.message is None:
+        if sys.stdin.isatty():
+            args.interactive = True
+
     if not debug:
         args.load_response_from_file = None
         args.save_response_to_file = None
 
-    validate_args(args)
+    validate_args(args, debug=debug)
 
     return split_arguments(args)
