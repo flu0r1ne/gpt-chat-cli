@@ -33,21 +33,6 @@ from .color import get_color_codes
 ####   SAVE / REPLAY   ####
 ###########################
 
-
-# def create_chat_completion_from_args(args : CompletionArguments) \
-#         -> OpenAIChatResponseStream:
-#     return create_chat_completion(
-#         model=args.model,
-#         messages=[{ "role": "user", "content": args.message }],
-#         n=args.n_completions,
-#         temperature=args.temperature,
-#         presence_penalty=args.presence_penalty,
-#         frequency_penalty=args.frequency_penalty,
-#         max_tokens=args.max_tokens,
-#         top_p=args.top_p,
-#         stream=True
-#     )
-
 def create_singleton_chat_completion(
         message : str,
         completion_args : CompletionArguments
