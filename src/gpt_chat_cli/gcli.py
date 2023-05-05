@@ -20,8 +20,10 @@ from .argparsing import (
     Arguments,
     DisplayArguments,
     CompletionArguments,
+    DebugArguments,
 )
 
+from .version import VERSION
 from .color import get_color_codes
 
 ###########################
@@ -132,17 +134,28 @@ def print_streamed_response(
 def main():
     args = parse_args()
 
+    if args.version:
+        print(f'version {VERSION}')
+        sys.exit(0)
+
     completion_args = args.completion_args
+    COLOR_CODE = get_color_codes(no_color = not args.display_args.color)
 
-    if args.debug_args:
-        debug_args : DebugArguments = args.debug_args
+    debug_args : DebugArguments = args.debug_args
 
-        if debug_args.save_response_to_file:
-            save_response_and_arguments(args)
-            return
-        elif debug_args.load_response_from_file:
-            completion_args, completion = load_response_and_arguments(args)
+    if debug_args.save_response_to_file:
+        save_response_and_arguments(args)
+        return
+    elif debug_args.load_response_from_file:
+        completion_args, completion = load_response_and_arguments(args)
     else:
+        if args.completion_args.message is None:
+            if sys.stdin.isatty():
+                print(f'GPT Chat CLI {VERSION}')
+                print(f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}]', end=' ', flush=True)
+
+            completion_args.message = sys.stdin.read()
+
         completion = create_chat_completion_from_args(completion_args)
 
     print_streamed_response(

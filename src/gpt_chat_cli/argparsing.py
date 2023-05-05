@@ -64,9 +64,10 @@ class DebugArguments:
 class Arguments:
     completion_args: CompletionArguments
     display_args: DisplayArguments
+    version: bool
     debug_args: Optional[DebugArguments] = None
 
-def split_arguments(args: argparse.Namespace, debug=False) -> Arguments:
+def split_arguments(args: argparse.Namespace) -> Arguments:
     completion_args = CompletionArguments(
         model=args.model,
         n_completions=args.n_completions,
@@ -83,15 +84,17 @@ def split_arguments(args: argparse.Namespace, debug=False) -> Arguments:
         color=(args.color == AutoDetectedOption.ON),
     )
 
-    if debug:
-        debug_args = DebugArguments(
-            save_response_to_file=args.save_response_to_file,
-            load_response_from_file=args.load_response_from_file,
-        )
-    else:
-        debug_args = None
+    debug_args = DebugArguments(
+        save_response_to_file=args.save_response_to_file,
+        load_response_from_file=args.load_response_from_file,
+    )
 
-    return Arguments( completion_args, display_args, debug_args )
+    return Arguments(
+           completion_args=completion_args,
+           display_args=display_args,
+           debug_args=debug_args,
+           version=args.version
+    )
 
 def parse_args() -> Arguments:
 
@@ -199,8 +202,16 @@ def parse_args() -> Arguments:
     )
 
     parser.add_argument(
+        "--version",
+        # type=bool,
+        action="store_true",
+        help="Print version and exit"
+    )
+
+    parser.add_argument(
         "message",
         type=str,
+        nargs='?',
         help=(
             "The contents of the message. When used in chat mode, this is the initial "
             "message if provided."
@@ -255,4 +266,4 @@ def parse_args() -> Arguments:
 
     validate_args(args)
 
-    return split_arguments(args, debug=debug)
+    return split_arguments(args)
