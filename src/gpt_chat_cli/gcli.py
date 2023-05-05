@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import argparse
 import sys
 import openai
@@ -7,19 +9,19 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple
 
-from openai_wrappers import (
+from .openai_wrappers import (
     create_chat_completion,
     OpenAIChatResponse,
     OpenAIChatResponseStream,
     FinishReason,
 )
 
-from argparsing import (
+from .argparsing import (
     parse_args,
     AutoDetectedOption,
 )
 
-from color import get_color_codes
+from .color import get_color_codes
 
 ###########################
 ####   SAVE / REPLAY   ####

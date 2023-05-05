@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpt-chat-cli"
+version = "0.0.1"
+authors = [
+  { name="Flu0r1ne", email="flu0r1ne@flu0r1ne.net" },
+]
+description = "A simple ChatGPT terminal CLI"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/flu0r1ne/gpt-chat-cli"
+"Bug Tracker" = "https://github.com/flu0r1ne/gpt-chat-cli/issues"
+
