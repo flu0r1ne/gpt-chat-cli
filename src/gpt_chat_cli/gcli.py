@@ -105,7 +105,7 @@ def print_streamed_response(args : argparse.Namespace, completion : OpenAIChatRe
 
         if not prompt_printed and ADORNMENTS:
             res_indicator = '' if N_COMPLETIONS == 1 else \
-                    f' {display_idx + 1}/{n_completions}'
+                    f' {display_idx + 1}/{N_COMPLETIONS}'
             PROMPT = f'[{COLOR_CODE.GREEN}{update.model}{COLOR_CODE.RESET}{COLOR_CODE.RED}{res_indicator}{COLOR_CODE.RESET}]'
             prompt_printed = True
             print(PROMPT, end=' ', flush=True)
