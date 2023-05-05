@@ -3,6 +3,17 @@ gpt-chat-cli
 
 A simple ChatGPT CLI.
 
+### Installation:
+
+```
+pip install gpt-chat-cli
+```
+
+The OpenAI API uses API keys for authentication. Visit your (API Keys page)[https://platform.openai.com/account/api-keys] to retrieve the API key you'll use in your requests. Then, source the `OPENAI_API_KEY` environmental variable in your shell's configuration file. (That is, `~/.bashrc` or `~/.zshrc` for the Bash or Zsh shell, respectively.)
+```
+export OPENAI_API_KEY="INSERT_SECRET_KEY"
+```
+
 ### Examples:
 
 ```
