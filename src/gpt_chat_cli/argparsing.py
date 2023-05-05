@@ -65,6 +65,7 @@ class Arguments:
     completion_args: CompletionArguments
     display_args: DisplayArguments
     version: bool
+    list_models: bool
     debug_args: Optional[DebugArguments] = None
 
 def split_arguments(args: argparse.Namespace) -> Arguments:
@@ -93,7 +94,8 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
            completion_args=completion_args,
            display_args=display_args,
            debug_args=debug_args,
-           version=args.version
+           version=args.version,
+           list_models=args.list_models,
     )
 
 def parse_args() -> Arguments:
@@ -203,9 +205,15 @@ def parse_args() -> Arguments:
 
     parser.add_argument(
         "--version",
-        # type=bool,
         action="store_true",
         help="Print version and exit"
+    )
+
+    parser.add_argument(
+        "-l",
+        "--list-models",
+        action="store_true",
+        help="List models and exit"
     )
 
     parser.add_argument(

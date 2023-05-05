@@ -67,3 +67,16 @@ def create_chat_completion(*args, **kwargs) \
         OpenAIChatResponse.from_json(update) \
         for update in  openai.ChatCompletion.create(*args, **kwargs)
     )
+
+def list_models() -> List[str]:
+
+    model_data = openai.Model.list()
+
+    models = []
+
+    for model in model_data["data"]:
+        models.append(model["id"])
+
+    models.sort()
+
+    return models

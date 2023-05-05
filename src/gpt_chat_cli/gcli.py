@@ -10,6 +10,7 @@ from typing import Tuple
 
 from .openai_wrappers import (
     create_chat_completion,
+    list_models,
     OpenAIChatResponse,
     OpenAIChatResponseStream,
     FinishReason,
@@ -136,6 +137,13 @@ def main():
 
     if args.version:
         print(f'version {VERSION}')
+        sys.exit(0)
+
+    if args.list_models:
+
+        for model in list_models():
+            print(model)
+
         sys.exit(0)
 
     completion_args = args.completion_args
