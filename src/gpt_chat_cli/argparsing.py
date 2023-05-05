@@ -57,13 +57,11 @@ class CompletionArguments:
     frequency_penalty: float
     max_tokens: int
     top_p: float
-    message: str
 
 @dataclass
 class DisplayArguments:
     adornments: bool
     color: bool
-
 
 @dataclass
 class DebugArguments:
@@ -77,6 +75,7 @@ class Arguments:
     version: bool
     list_models: bool
     interactive: bool
+    initial_message: Optional[str] = None
     debug_args: Optional[DebugArguments] = None
 
 def split_arguments(args: argparse.Namespace) -> Arguments:
@@ -88,7 +87,6 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
         frequency_penalty=args.frequency_penalty,
         max_tokens=args.max_tokens,
         top_p=args.top_p,
-        message=args.message
     )
 
     display_args = DisplayArguments(
@@ -102,6 +100,7 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
     )
 
     return Arguments(
+           initial_message=args.message,
            completion_args=completion_args,
            display_args=display_args,
            debug_args=debug_args,

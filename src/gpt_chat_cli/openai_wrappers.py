@@ -28,6 +28,24 @@ class Choice:
     finish_reason: Optional[FinishReason]
     index: int
 
+class Role(Enum):
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "assistant"
+
+@dataclass
+class ChatMessage:
+    role: Role
+    content: str
+
+    def to_json(self : "ChatMessage"):
+        return {
+            "role": self.role.value,
+            "content": self.content
+        }
+
+ChatHistory = List[ChatMessage]
+
 @dataclass
 class OpenAIChatResponse:
     choices: List[Choice]
@@ -61,12 +79,30 @@ class OpenAIChatResponse:
 
 OpenAIChatResponseStream = Generator[OpenAIChatResponse, None, None]
 
-def create_chat_completion(*args, **kwargs) \
-        -> OpenAIChatResponseStream:
-    return (
-        OpenAIChatResponse.from_json(update) \
-        for update in  openai.ChatCompletion.create(*args, **kwargs)
+from .argparsing import CompletionArguments
+
+def create_chat_completion(hist : ChatHistory, args: CompletionArguments) \
+    -> OpenAIChatResponseStream:
+
+    messages = [ msg.to_json() for msg in hist ]
+
+    response = openai.ChatCompletion.create(
+        model=args.model,
+        messages=messages,
+        n=args.n_completions,
+        temperature=args.temperature,
+        presence_penalty=args.presence_penalty,
+        frequency_penalty=args.frequency_penalty,
+        max_tokens=args.max_tokens,
+        top_p=args.top_p,
+        stream=True
     )
+
+    return (
+        OpenAIChatResponse.from_json( update ) \
+        for update in response
+    )
+
 
 def list_models() -> List[str]:
 
