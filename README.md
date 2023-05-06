@@ -3,7 +3,7 @@ gpt-chat-cli
 
 > This is a WIP. Please consider it experimental.
 
-A simple ChatGPT CLI.
+A simple yet powerful ChatGPT CLI.
 
 ### Installation:
 
@@ -76,12 +76,12 @@ Note that this implementation uses the `powi()` method to compute the squared di
 ### Usage:
 
 ```
-usage: gpt-chat-cli [-h] [-m MODEL] [-t TEMPERATURE] [-f FREQUENCY_PENALTY] [-p PRESENCE_PENALTY] [-k MAX_TOKENS] [-s TOP_P] [-n N_COMPLETIONS]
-                    [--adornments {AutoDetectedOption.ON,AutoDetectedOption.OFF,AutoDetectedOption.AUTO}] [--color {AutoDetectedOption.ON,AutoDetectedOption.OFF,AutoDetectedOption.AUTO}]
-                    message
+usage: gcli.py [-h] [-m MODEL] [-t TEMPERATURE] [-f FREQUENCY_PENALTY] [-p PRESENCE_PENALTY] [-k MAX_TOKENS] [-s TOP_P] [-n N_COMPLETIONS] [--adornments {on,off,auto}] [--color {on,off,auto}] [--version] [-l]
+               [-i]
+               [message]
 
 positional arguments:
-  message               The contents of the message. When used in chat mode, this is the initial message if provided.
+  message               The contents of the message. When in a interactive session, this is the initial prompt provided.
 
 options:
   -h, --help            show this help message and exit
@@ -100,10 +100,13 @@ options:
                         comprising the top 10% probability mass are considered.
   -n N_COMPLETIONS, --n-completions N_COMPLETIONS
                         How many chat completion choices to generate for each input message.
-  --adornments {AutoDetectedOption.ON,AutoDetectedOption.OFF,AutoDetectedOption.AUTO}
+  --adornments {on,off,auto}
                         Show adornments to indicate the model and response. Can be set to 'on', 'off', or 'auto'.
-  --color {AutoDetectedOption.ON,AutoDetectedOption.OFF,AutoDetectedOption.AUTO}
+  --color {on,off,auto}
                         Set color to 'on', 'off', or 'auto'.
+  --version             Print version and exit
+  -l, --list-models     List models and exit
+  -i, --interactive     Start an interactive session
 ```
 
 ### Features:
@@ -112,5 +115,9 @@ options:
 - [x] Color and adornments
 - [x] Support for multiple completions
 - [x] Support for any model which is supported through the chat completions API. [See model endpoint compatibility.](https://platform.openai.com/docs/models/model-endpoint-compatibility)
-- [x] Capability to modify parameters including temperature, frequency penalty, presence penalty, top p, and the maximum number of tokens emitted.
-
+- [x] Capability to modify parameters including temperature, frequency penalty, presence penalty, top p, and the maximum number of tokens emitted
+- [x] Interactive sessions
+- [x] Code syntax highlighting (when the LLM labels code blocks)
+- [x] Interactive mode with emacs-style editing
+- [x] Input from standard in, pipes, and heredoc
+- [x] List available models
