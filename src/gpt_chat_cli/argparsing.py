@@ -7,19 +7,12 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Tuple, Optional
 
-class AutoDetectedOption(Enum):
-    ON = 'on'
-    OFF = 'off'
-    AUTO = 'auto'
-
-    def __str__(self : "AutoDetectedOption"):
-        return self.value
-
 def die_validation_err(err : str):
     print(err, file=sys.stderr)
     sys.exit(1)
 
 def validate_args(args: argparse.Namespace, debug : bool = False) -> None:
+
     if not 0 <= args.temperature <= 2:
         die_validation_err("Temperature must be between 0 and 2.")
 
@@ -50,6 +43,14 @@ def validate_args(args: argparse.Namespace, debug : bool = False) -> None:
             args.save_response_to_file or args.load_response_from_file
         ):
             die_validation_err("Save and load operations cannot be used in interactive mode")
+
+class AutoDetectedOption(Enum):
+    ON = 'on'
+    OFF = 'off'
+    AUTO = 'auto'
+
+    def __str__(self : "AutoDetectedOption"):
+        return self.value
 
 @dataclass
 class CompletionArguments:
@@ -128,9 +129,9 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
 
 def parse_args() -> Arguments:
 
-    GCLI_ENV_PREFIX = "GCLI_"
+    GPT_CLI_ENV_PREFIX = "GPT_CLI_"
 
-    debug = os.getenv(f'{GCLI_ENV_PREFIX}DEBUG') is not None
+    debug = os.getenv(f'{GPT_CLI_ENV_PREFIX}DEBUG') is not None
 
     if debug:
         logging.warning("Debugging mode and unstable features have been enabled.")
@@ -140,7 +141,7 @@ def parse_args() -> Arguments:
     parser.add_argument(
         "-m",
         "--model",
-        default=os.getenv(f'{GCLI_ENV_PREFIX}MODEL', "gpt-3.5-turbo"),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}MODEL', "gpt-3.5-turbo"),
         help="ID of the model to use",
     )
 
@@ -148,7 +149,7 @@ def parse_args() -> Arguments:
         "-t",
         "--temperature",
         type=float,
-        default=os.getenv(f'{GCLI_ENV_PREFIX}TEMPERATURE', 0.5),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}TEMPERATURE', 0.5),
         help=(
             "What sampling temperature to use, between 0 and 2. Higher values "
             "like 0.8 will make the output more random, while lower values "
@@ -160,7 +161,7 @@ def parse_args() -> Arguments:
         "-f",
         "--frequency-penalty",
         type=float,
-        default=os.getenv(f'{GCLI_ENV_PREFIX}FREQUENCY_PENALTY', 0),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}FREQUENCY_PENALTY', 0),
         help=(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based "
             "on their existing frequency in the text so far, decreasing the model's "
@@ -172,7 +173,7 @@ def parse_args() -> Arguments:
         "-p",
         "--presence-penalty",
         type=float,
-        default=os.getenv(f'{GCLI_ENV_PREFIX}PRESENCE_PENALTY', 0),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}PRESENCE_PENALTY', 0),
         help=(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based "
             "on whether they appear in the text so far, increasing the model's "
@@ -184,10 +185,10 @@ def parse_args() -> Arguments:
         "-k",
         "--max-tokens",
         type=int,
-        default=os.getenv(f'{GCLI_ENV_PREFIX}MAX_TOKENS', 2048),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}MAX_TOKENS', 3072),
         help=(
             "The maximum number of tokens to generate in the chat completion. "
-            "Defaults to 2048."
+            "Defaults to 3072."
         ),
     )
 
@@ -195,7 +196,7 @@ def parse_args() -> Arguments:
         "-s",
         "--top-p",
         type=float,
-        default=os.getenv(f'{GCLI_ENV_PREFIX}TOP_P', 1),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}TOP_P', 1),
         help=(
             "An alternative to sampling with temperature, called nucleus sampling, "
             "where the model considers the results of the tokens with top_p "
@@ -208,14 +209,14 @@ def parse_args() -> Arguments:
         "-n",
         "--n-completions",
         type=int,
-        default=os.getenv('f{GCLI_ENV_PREFIX}N_COMPLETIONS', 1),
+        default=os.getenv('f{GPT_CLI_ENV_PREFIX}N_COMPLETIONS', 1),
         help="How many chat completion choices to generate for each input message.",
     )
 
     parser.add_argument(
         "--system-message",
         type=str,
-        default=os.getenv('f{GCLI_ENV_PREFIX}SYSTEM_MESSAGE'),
+        default=os.getenv('f{GPT_CLI_ENV_PREFIX}SYSTEM_MESSAGE'),
         help="Specify an alternative system message.",
     )
 
