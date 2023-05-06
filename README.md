@@ -1,19 +1,19 @@
 gpt-chat-cli: a simple yet powerful ChatGPT CLI
 -----------------------------------------------
 
-## Intro
+## Introduction
 
-`gpt-chat-cli` is a simple, general purpose ChatGPT CLI. It brings the power of ChatGPT to the command line. It aims to be easy to use and configurable.
+`gpt-chat-cli` is a simple, general purpose ChatGPT CLI. It brings the power of ChatGPT to the command line. It aims to be easy to use and highly configurable.
 
 Some of the features include:
-- Streaming, real-time output
-- Interactive sessions with color and adornments
-- Support for any model which can be called through OpenAI's chat completions API.
+- Streaming, real-time output.
+- Interactive sessions with color and adornments.
+- Support for any model that can be called through OpenAI's chat completions API.
   [See model endpoint compatibility.](https://platform.openai.com/docs/models/model-endpoint-compatibility)
-- Modify model parameters including temperature, frequency penalty, presence penalty, top p, and the maximum number of tokens emitted
-- Dynamic code syntax highlighting
-- List available models
-- Respects unix norms. Input can be gathered from pipes, heredoc, files, and arbitrary file descriptors.
+- Ability to modify model parameters including temperature, frequency penalty, presence penalty, top p, and the maximum number of tokens emitted.
+- Dynamic code syntax highlighting.
+- List the available models.
+- Respects Unix norms. Input can be gathered from pipes, heredoc, files, and arbitrary file descriptors.
 
 ![gpt-chat-cli Completion Demo](./assets/images/gpt.gif)
 
@@ -23,18 +23,18 @@ Some of the features include:
 pip install gpt-chat-cli
 ```
 
-The OpenAI API uses API keys for authentication. Visit your [API Keys page](https://platform.openai.com/account/api-keys) to retrieve the API key you'll use in your requests. 
+The OpenAI API uses API keys for authentication. Visit your [API Keys page](https://platform.openai.com/account/api-keys) to retrieve the API key you'll use in your requests:
 ```bash
 export OPENAI_API_KEY="INSERT_SECRET_KEY"
 ```
 
-Then, source the `OPENAI_API_KEY` environmental variable in your shell's configuration file. (That is, `~/.bashrc` or `~/.zshrc` for the Bash or Zsh shell, respectively.)
+Then, source the `OPENAI_API_KEY` environmental variable in your shell's configuration file. (That is, `~/.bashrc` or `~/.zshrc` for the Bash or Zsh shell, respectively):
 
 ```bash
 source ~/.bashrc
 ```
 
-### User guide
+### User Guide
 
 #### Basic Usage
 
@@ -48,7 +48,7 @@ Press Control-D to exit
 [gpt-3.5-turbo-0301] Hello! How can I assist you today?
 ```
 
-For a single completion, an initial message can be specified as the first positional:
+For a single completion, an initial message can be specified as the first positional argument:
 
 ```text
 $ gpt-chat-cli "In one sentence, who is Joseph Weizenbaum?"
@@ -57,7 +57,7 @@ and philosopher who is known for creating the ELIZA program, one of the first
 natural language processing programs.
 ```
 
-Or, specify the inital message and drop into an interactive shell with `-i`:
+Alternatively, you can specify the initial message and drop into an interactive shell with `-i`:
 
 ```text
 $ gpt-chat-cli -i "What linux command prints a list of all open TCP sockets on port 8080?"
@@ -75,7 +75,7 @@ list all open TCP sockets on port 8080. The command to list all open TCP sockets
 on port 8080 using `ss` is `sudo ss -tlnp 'sport = :8080'`
 ```
 
-`gpt-chat-cli` respects pipes and redirects:
+`gpt-chat-cli` respects pipes and redirects, so you can use it in combination with other command-line tools:
 
 ```text
 $ printf "What is smmsp in /etc/group?\n$(cat /etc/group | head)" | gpt-chat-cli
@@ -101,7 +101,7 @@ fn main() {
 This code creates a vector of numbers, calculates the sum of the numbers using the `iter()` method and the `sum()` method, counts the number of elements in the vector using the `len()` method, and then calculates the average by dividing the sum by the count. Finally, it prints the average to the console.
 ```
 
-List available models:
+To list all available models, use the following command:
 
 ```text
 $ gpt-chat-cli --list-models
@@ -165,7 +165,7 @@ Environmental variables can control default model parameters. They are overwritt
 | `GPT_CLI_FREQUENCY_PENALTY` | Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far | 0 |
 | `GPT_CLI_PRESENCE_PENALTY` | Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far | 0 |
 | `GPT_CLI_MAX_TOKENS` | The maximum number of tokens to generate in the chat completion | 2048 |
-| `GPT_CLI_TOP_P` | An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass | 1 |
+| `GPT_CLI_TOP_P` | An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with `top_p` probability mass | 1 |
 | `GPT_CLI_N_COMPLETIONS` | How many chat completion choices to generate for each input message | 1 |
 | `GPT_CLI_SYSTEM_MESSAGE` | Specify an alternative system message | [See this section](#system-message) |
 
@@ -177,11 +177,11 @@ The default [system message](https://platform.openai.com/docs/guides/chat/instru
 The current date and time is 2023-05-06 15:55:56.619232. When emitting code or producing markdown, ensure to label fenced code blocks with the language in use.'
 ```
 
-This can be overridden. GPT 3.5 seems to sometime forget to emit labels for fenced code blocks which prevents the syntax highlighting from taking effect. Thus, a reminder in the system message is recommended.
+This can be overridden. GPT 3.5 sometimes forgets to emit labels for fenced code blocks, which prevents the syntax highlighting from taking effect. Thus, a reminder in the system message is recommended.
 
 #### Tricks
 
-You can use heredoc in bash to create a prompt with includes a file:
+You can use heredoc in `bash` to create a prompt with includes a file:
 
 ```text
 $ gpt-chat-cli -i --prompt-from-fd 3 3<<EOF
@@ -208,7 +208,7 @@ sorting an array of pointers to `dl_entry` structures based on the `access_time`
 [#]
 ```
 
-#### Known issues
+#### Known Issues
 
 There are a couple known issues. PRs are accepted:
 
@@ -218,3 +218,4 @@ There are a couple known issues. PRs are accepted:
 ```text
 openai.error.InvalidRequestError: This model's maximum context length is 4097 tokens. However, your messages resulted in 9758 tokens. Please reduce the length of the messages.
 ```
+
