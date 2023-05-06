@@ -208,6 +208,56 @@ sorting an array of pointers to `dl_entry` structures based on the `access_time`
 [#]
 ```
 
+Create a bash alias for a particular model:
+
+```
+$ alias gpt3='gpt-chat-cli -m gpt-3.5-turbo'
+$ gpt3
+[#] ...
+```
+
+Of course, custom scripting can extend the capabilities. For example, this `bash` function will suggest commands to accomplish tasks on the command line:
+
+```bash
+function cmd {
+	local request="$1"
+	local shell=$(basename "${SHELL}")
+
+	local os=""
+
+	if command -v lsb_release >/dev/null 2>&1; then
+		os="$ lsb_release -a\n$(lsb_release -a)\n"
+	fi
+
+	local kernel=""
+
+	if command -v uname >/dev/null 2>&1; then
+		kernel="$ uname -s -r\n$(uname -s -r)\n"
+	fi
+
+	local prompt=""
+
+	prompt="${prompt}Suggest a command to be run in the $shell to accomplish the following task:\n"
+	prompt="${prompt}$request\n"
+	prompt="${prompt}Please output the command and a short description\n"
+
+	if [ -n "${os}" ] || [ -n "${kernel}" ]; then
+		prompt="${prompt}Here is some additional info about the system:${os}${kernel}"
+	fi
+
+	printf "$prompt" | gpt-chat-cli
+}
+```
+
+```
+$ cmd "test if ip forwarding is enabled"
+[gpt-3.5-turbo-0301] You can use the `sysctl` command to test if IP forwarding is enabled. Here's the command you can run in your zsh shell:
+
+sysctl net.ipv4.ip_forward
+
+This command will return `net.ipv4.ip_forward = 0` if IP forwarding is disabled and `net.ipv4.ip_forward = 1` if IP forwarding is enabled.
+```
+
 #### Known Issues
 
 There are a couple known issues. PRs are accepted:
