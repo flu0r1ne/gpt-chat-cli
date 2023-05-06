@@ -103,6 +103,9 @@ def create_chat_completion(hist : ChatHistory, args: CompletionArguments) \
         for update in response
     )
 
+def is_compatible_model(_id : str):
+    ''' FIXME: There seems no better way to do this currently ... '''
+    return 'gpt' in _id
 
 def list_models() -> List[str]:
 
@@ -111,7 +114,8 @@ def list_models() -> List[str]:
     models = []
 
     for model in model_data["data"]:
-        models.append(model["id"])
+        if is_compatible_model(model["id"]):
+            models.append(model["id"])
 
     models.sort()
 
