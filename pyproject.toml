@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gpt-chat-cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Flu0r1ne", email="flu0r1ne@flu0r1ne.net" },
 ]

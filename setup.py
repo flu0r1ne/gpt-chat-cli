@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='gpt-chat-cli',
-    version='0.1.0',
+    version='0.1.1',
     entry_points = {
         'console_scripts': ['gpt-chat-cli=gpt_chat_cli.gcli:main'],
     },
