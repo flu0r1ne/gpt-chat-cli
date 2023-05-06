@@ -69,7 +69,7 @@ open TCP sockets on a specific port. The command to list all open TCP sockets on
 port 8080 is `sudo lsof -i :8080`
 
 
-[#] Can do do this with ss?
+[#] Can you do this with ss?
 [gpt-3.5-turbo-0301] Yes, you can also use the `ss` (socket statistics) command to
 list all open TCP sockets on port 8080. The command to list all open TCP sockets
 on port 8080 using `ss` is `sudo ss -tlnp 'sport = :8080'`
