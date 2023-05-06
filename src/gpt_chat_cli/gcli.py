@@ -29,6 +29,9 @@ from .argparsing import (
 from .version import VERSION
 from .color import get_color_codes
 
+import datetime
+
+
 ###########################
 ####   SAVE / REPLAY   ####
 ###########################
@@ -38,7 +41,7 @@ def create_singleton_chat_completion(
         completion_args : CompletionArguments
     ):
 
-    hist = [ ChatMessage( Role.USER, message ) ]
+    hist = [ get_system_message(), ChatMessage( Role.USER, message ) ]
 
     completion = create_chat_completion(hist, completion_args)
 
@@ -85,6 +88,8 @@ class CumulativeResponse:
         self.content += new_chunk
         self.delta_content += new_chunk
 
+from .chat_colorizer import ChatColorizer
+
 def print_streamed_response(
         display_args : DisplayArguments,
         completion : OpenAIChatResponseStream,
@@ -98,12 +103,16 @@ def print_streamed_response(
     on until all responses have been printed.
     """
 
-    COLOR_CODE = get_color_codes(no_color = not display_args.color)
+    no_color = not display_args.color
+
+    COLOR_CODE = get_color_codes(no_color = no_color)
     adornments = display_args.adornments
 
     cumu_responses = defaultdict(CumulativeResponse)
     display_idx = 0
     prompt_printed = False
+
+    chat_colorizer = ChatColorizer(no_color = no_color)
 
     for update in completion:
 
@@ -126,10 +135,15 @@ def print_streamed_response(
             print(PROMPT, end=' ', flush=True)
 
         content = display_response.take_delta()
-        print(f'{COLOR_CODE.WHITE}{content}{COLOR_CODE.RESET}',
-              sep='', end='', flush=True)
+        chat_colorizer.add_chunk( content )
+
+        chat_colorizer.print()
 
         if display_response.finish_reason is not FinishReason.NONE:
+            chat_colorizer.finish()
+            chat_colorizer.print()
+            chat_colorizer = ChatColorizer( no_color=no_color )
+
             if display_idx < n_completions:
                 display_idx += 1
                 prompt_printed = False
@@ -142,6 +156,13 @@ def print_streamed_response(
     if return_responses:
         return [ cumu_responses[i].content for i in range(n_completions) ]
 
+def get_system_message():
+    current_date_time = datetime.datetime.now()
+
+    msg = f'The current date is {current_date_time}. When emitting code or producing markdown, ensure to label fenced code blocks with the language in use.'
+
+    return ChatMessage( Role.SYSTEM, msg)
+
 def cmd_version():
     print(f'version {VERSION}')
 
@@ -149,25 +170,34 @@ def cmd_list_models():
     for model in list_models():
         print(model)
 
+def enable_emacs_editing():
+    try:
+        import readline
+        # self.old_completer = readline.get_completer()
+        # readline.set_completer(self.complete)
+        # readline.parse_and_bind(self.completekey+": complete")
+    except ImportError:
+        pass
+
 def cmd_interactive(args : Arguments):
+
+    enable_emacs_editing()
+
     COLOR_CODE = get_color_codes(no_color = not args.display_args.color)
 
     completion_args = args.completion_args
     display_args = args.display_args
 
-    hist = []
+    hist = [ get_system_message() ]
 
-    def print_prompt():
-
-        print(f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}]', end=' ', flush=True)
+    PROMPT = f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}] '
 
     def prompt_message() -> bool:
-        print_prompt()
 
         # Control-D closes the input stream
         try:
-            message = input()
-        except EOFError:
+            message = input( PROMPT )
+        except (EOFError, KeyboardInterrupt):
             print()
             return False
 
@@ -179,21 +209,24 @@ def cmd_interactive(args : Arguments):
     print(f'Press Control-D to exit')
 
     if args.initial_message:
-        print_prompt()
-        print( args.initial_message )
+        print( PROMPT, args.initial_message, sep='' )
         hist.append( ChatMessage( Role.USER, args.initial_message ) )
     else:
-        prompt_message()
+        if not prompt_message():
+            return
 
     while True:
 
         completion = create_chat_completion(hist, completion_args)
 
-        response = print_streamed_response(
-            display_args, completion, 1, return_responses=True,
-        )[0]
+        try:
+            response = print_streamed_response(
+                display_args, completion, 1, return_responses=True,
+            )[0]
 
-        hist.append( ChatMessage(Role.ASSISTANT, response) )
+            hist.append( ChatMessage(Role.ASSISTANT, response) )
+        except:
+            pass
 
         if not prompt_message():
             break
