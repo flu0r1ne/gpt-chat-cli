@@ -41,6 +41,9 @@ def validate_args(args: argparse.Namespace, debug : bool = False) -> None:
     if args.interactive and args.n_completions != 1:
         die_validation_err("Only a single completion can be used in interactive mode")
 
+    if (args.prompt_from_fd or args.prompt_from_file) and args.message:
+        die_validation_err("Cannot specify an initial message alongside --prompt_from_fd or --prompt_from_file")
+
     if debug and args.interactive:
 
         if args.interactive and (
@@ -69,13 +72,20 @@ class DebugArguments:
     load_response_from_file: Optional[str]
 
 @dataclass
+class MessageSource:
+    message: Optional[str] = None
+    prompt_from_fd: Optional[str] = None
+    prompt_from_file: Optional[str] = None
+
+@dataclass
 class Arguments:
     completion_args: CompletionArguments
     display_args: DisplayArguments
     version: bool
     list_models: bool
     interactive: bool
-    initial_message: Optional[str] = None
+    initial_message: MessageSource
+    system_message: Optional[str] = None
     debug_args: Optional[DebugArguments] = None
 
 def split_arguments(args: argparse.Namespace) -> Arguments:
@@ -89,6 +99,12 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
         top_p=args.top_p,
     )
 
+    msg_src = MessageSource(
+        message = args.message,
+        prompt_from_fd = args.prompt_from_fd,
+        prompt_from_file = args.prompt_from_file,
+    )
+
     display_args = DisplayArguments(
         adornments=(args.adornments == AutoDetectedOption.ON),
         color=(args.color == AutoDetectedOption.ON),
@@ -100,13 +116,14 @@ def split_arguments(args: argparse.Namespace) -> Arguments:
     )
 
     return Arguments(
-           initial_message=args.message,
+           initial_message=msg_src,
            completion_args=completion_args,
            display_args=display_args,
            debug_args=debug_args,
            version=args.version,
            list_models=args.list_models,
-           interactive=args.interactive
+           interactive=args.interactive,
+           system_message=args.system_message
     )
 
 def parse_args() -> Arguments:
@@ -196,6 +213,13 @@ def parse_args() -> Arguments:
     )
 
     parser.add_argument(
+        "--system-message",
+        type=str,
+        default=os.getenv('f{GCLI_ENV_PREFIX}SYSTEM_MESSAGE'),
+        help="Specify an alternative system message.",
+    )
+
+    parser.add_argument(
         "--adornments",
         type=AutoDetectedOption,
         choices=list(AutoDetectedOption),
@@ -232,6 +256,20 @@ def parse_args() -> Arguments:
         "--interactive",
         action="store_true",
         help="Start an interactive session"
+    )
+
+    initial_prompt = parser.add_mutually_exclusive_group()
+
+    initial_prompt.add_argument(
+        '--prompt-from-fd',
+        type=int,
+        help="Obtain the initial prompt from the specified file descriptor",
+    )
+
+    initial_prompt.add_argument(
+        '--prompt-from-file',
+        type=str,
+        help="Obtain the initial prompt from the specified file",
     )
 
     parser.add_argument(
@@ -286,7 +324,13 @@ def parse_args() -> Arguments:
         else:
             args.adornments = AutoDetectedOption.OFF
 
-    if args.message is None:
+    initial_message_specified = (
+        args.message or
+        args.prompt_from_fd or
+        args.prompt_from_file
+    )
+
+    if not initial_message_specified:
         if debug and args.load_response_from_file:
             args.interactive = False
         elif sys.stdin.isatty():
