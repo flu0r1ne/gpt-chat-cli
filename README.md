@@ -15,9 +15,9 @@ Some of the features include:
 - List available models
 - Respects unix norms. Input can be gathered from pipes, heredoc, files, and arbitrary file descriptors.
 
-![gpt-cli](./assets/images/gpt.gif)
+![gpt-chat-cli Completion Demo](./assets/images/gpt.gif)
 
-### Installation:
+### Installation
 
 ```bash
 pip install gpt-chat-cli
@@ -36,7 +36,83 @@ source ~/.bashrc
 
 ### User guide
 
-#### Usage:
+#### Basic Usage
+
+Without additional arguments, `gpt-chat-cli` will drop the user into an interactive shell:
+
+```text
+$ gpt-chat-cli
+GPT Chat CLI version 0.1.0
+Press Control-D to exit
+[#] Hello!
+[gpt-3.5-turbo-0301] Hello! How can I assist you today?
+```
+
+For a single completion, an initial message can be specified as the first positional:
+
+```text
+$ gpt-chat-cli "In one sentence, who is Joseph Weizenbaum?"
+[gpt-3.5-turbo-0301] Joseph Weizenbaum was a German-American computer scientist
+and philosopher who is known for creating the ELIZA program, one of the first 
+natural language processing programs.
+```
+
+Or, specify the inital message and drop into an interactive shell with `-i`:
+
+```text
+$ gpt-chat-cli -i "What linux command prints a list of all open TCP sockets on port 8080?"
+GPT Chat CLI version 0.1.0
+Press Control-D to exit
+[#] What linux command prints a list of all open TCP sockets on port 8080?
+[gpt-3.5-turbo-0301] You can use the `lsof` (list open files) command to list all
+open TCP sockets on a specific port. The command to list all open TCP sockets on
+port 8080 is `sudo lsof -i :8080`
+
+
+[#] Can do do this with ss?
+[gpt-3.5-turbo-0301] Yes, you can also use the `ss` (socket statistics) command to
+list all open TCP sockets on port 8080. The command to list all open TCP sockets
+on port 8080 using `ss` is `sudo ss -tlnp 'sport = :8080'`
+```
+
+`gpt-chat-cli` respects pipes and redirects:
+
+```text
+$ printf "What is smmsp in /etc/group?\n$(cat /etc/group | head)" | gpt-chat-cli
+[gpt-3.5-turbo-0301] `smmsp` is a system user and group used by the Sendmail mail transfer agent (MTA)
+for sending mail. The `smmsp` group is used to provide access to the Sendmail queue directory and
+other Sendmail-related files. Members of this group are allowed to read and write to the Sendmail
+queue directory and other Sendmail-related files.
+```
+
+```text
+$ gpt-chat-cli "Write rust code to find the average of a list" > average.rs
+$ cat average.rs
+Here's an example Rust code to find the average of a list of numbers:
+
+fn main() {
+    let numbers = vec![1, 2, 3, 4, 5];
+    let sum: i32 = numbers.iter().sum();
+    let count = numbers.len();
+    let average = sum / count as i32;
+    println!("The average is {}", average);
+}
+
+This code creates a vector of numbers, calculates the sum of the numbers using the `iter()` method and the `sum()` method, counts the number of elements in the vector using the `len()` method, and then calculates the average by dividing the sum by the count. Finally, it prints the average to the console.
+```
+
+List available models:
+
+```text
+$ gpt-chat-cli --list-models
+gpt-3.5-turbo
+gpt-3.5-turbo-0301
+gpt-4
+gpt-4-0314
+gpt-4-32k
+```
+
+#### Usage
 
 ```
 usage: gpt-chat-cli [-h] [-m MODEL] [-t TEMPERATURE] [-f FREQUENCY_PENALTY] [-p PRESENCE_PENALTY] [-k MAX_TOKENS] [-s TOP_P] [-n N_COMPLETIONS] [--system-message SYSTEM_MESSAGE] [--adornments {on,off,auto}]
@@ -91,4 +167,54 @@ Environmental variables can control default model parameters. They are overwritt
 | `GPT_CLI_MAX_TOKENS` | The maximum number of tokens to generate in the chat completion | 2048 |
 | `GPT_CLI_TOP_P` | An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass | 1 |
 | `GPT_CLI_N_COMPLETIONS` | How many chat completion choices to generate for each input message | 1 |
-| `GPT_CLI_SYSTEM_MESSAGE` | Specify an alternative system message | See |
+| `GPT_CLI_SYSTEM_MESSAGE` | Specify an alternative system message | [See this section](#system-message) |
+
+#### System Message
+
+The default [system message](https://platform.openai.com/docs/guides/chat/instructing-chat-models) is:
+
+```text
+The current date and time is 2023-05-06 15:55:56.619232. When emitting code or producing markdown, ensure to label fenced code blocks with the language in use.'
+```
+
+This can be overridden. GPT 3.5 seems to sometime forget to emit labels for fenced code blocks which prevents the syntax highlighting from taking effect. Thus, a reminder in the system message is recommended.
+
+#### Tricks
+
+You can use heredoc in bash to create a prompt with includes a file:
+
+```text
+$ gpt-chat-cli -i --prompt-from-fd 3 3<<EOF
+heredoc> Can you review this code:
+heredoc> $(cat quicksort.c)
+heredoc> EOF
+[#] Can you review this code:
+void quicksort(struct dl_entry ** entries, int low, int high){
+  if(high - low < 1)
+    return;
+
+  int left = low + 1;
+  int right = high;
+  while(left < right){
+    if(entries[right]->access_time < entries[low]->access_time)
+      right--;
+...
+[gpt-3.5-turbo-0301] The code appears to be a valid implementation of the quicksort algorithm for 
+sorting an array of pointers to `dl_entry` structures based on the `access_time` member. However, there are a few points that could be improved:
+
+1. Naming: The function name `quicksort` is not very descriptive. It would be better to name it something like `quicksort_entries_by_access_time` to make it clear what it does.
+
+...
+[#]
+```
+
+#### Known issues
+
+There are a couple known issues. PRs are accepted:
+
+1. `gpt-chat-cli` lacks shell completion
+2. `gpt-chat-cli` does not track token usage. Ideally, it should gracefully handle long messages and remove messages from the chat history if the number of tokens in the context is exceeded. If the tokens exceed the model's context, the following error will occur:
+
+```text
+openai.error.InvalidRequestError: This model's maximum context length is 4097 tokens. However, your messages resulted in 9758 tokens. Please reduce the length of the messages.
+```
