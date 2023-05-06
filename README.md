@@ -237,12 +237,12 @@ function cmd {
 
 	local prompt=""
 
-	prompt="${prompt}Suggest a command to be run in the $shell to accomplish the following task:\n"
-	prompt="${prompt}$request\n"
-	prompt="${prompt}Please output the command and a short description\n"
+	prompt="${prompt}Suggest a command to be run in the $shell to accomplish the following task:\n\n"
+	prompt="${prompt}$request\n\n"
+	prompt="${prompt}Please output the command and a short description\n\n"
 
 	if [ -n "${os}" ] || [ -n "${kernel}" ]; then
-		prompt="${prompt}Here is some additional info about the system:${os}${kernel}"
+		prompt="${prompt}Here is some additional info about the system:\n\n${os}${kernel}"
 	fi
 
 	printf "$prompt" | gpt-chat-cli
