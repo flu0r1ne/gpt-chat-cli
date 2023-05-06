@@ -185,10 +185,10 @@ def parse_args() -> Arguments:
         "-k",
         "--max-tokens",
         type=int,
-        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}MAX_TOKENS', 3072),
+        default=os.getenv(f'{GPT_CLI_ENV_PREFIX}MAX_TOKENS', 2048),
         help=(
             "The maximum number of tokens to generate in the chat completion. "
-            "Defaults to 3072."
+            "Defaults to 2048."
         ),
     )
 
