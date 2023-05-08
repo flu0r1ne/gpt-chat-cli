@@ -219,6 +219,26 @@ def cmd_list_models():
     for model in list_models():
         print(model)
 
+def surround_ansi_escapes(prompt, start = "\x01", end = "\x02"):
+        '''
+        Fixes issue on Linux with the readline module
+        See: https://github.com/python/cpython/issues/61539
+        '''
+        escaped = False
+        result = ""
+
+        for c in prompt:
+                if c == "\x1b" and not escaped:
+                        result += start + c
+                        escaped = True
+                elif c.isalpha() and escaped:
+                        result += c + end
+                        escaped = False
+                else:
+                        result += c
+
+        return result
+
 def cmd_interactive(args : Arguments):
 
     enable_emacs_editing()
@@ -231,6 +251,7 @@ def cmd_interactive(args : Arguments):
     hist = [ get_system_message( args.system_message ) ]
 
     PROMPT = f'[{COLOR_CODE.WHITE}#{COLOR_CODE.RESET}] '
+    PROMPT = surround_ansi_escapes(PROMPT)
 
     def prompt_message() -> bool:
 
