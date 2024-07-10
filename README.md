@@ -1,6 +1,14 @@
 gpt-chat-cli: a simple yet powerful ChatGPT CLI
 -----------------------------------------------
 
+> **NOTICE 2024-07-10**
+>
+> I am currently engaged in rewriting the `gpt-chat-cli` project in Rust. This effort aims to realize several benefits upon completion. Specifically, the Rust-based successor will:
+>
+> 1. Facilitate easier installation by providing a single binary that is independent of Python system dependencies and environment virtualization.
+> 2. Support multiple Large Language Models (LLMs), including local and private hosting options.
+> 3. Enhance stability and testing capabilities.
+
 ## Introduction
 
 `gpt-chat-cli` is a simple, general purpose ChatGPT CLI. It brings the power of ChatGPT to the command line. It aims to be easy to use and highly configurable.
